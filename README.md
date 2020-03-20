@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
@@ -66,3 +67,8 @@ This section has moved here: https://facebook.github.io/create-react-app/docs/de
 ### `yarn build` fails to minify
 
 This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+=======
+# CelebFaces
+Matching your face with 100 Bollywood Celebs by model trained using MTCNN and Facenet-pytorch.
+This repository contains the FrontEnd of the project.
+>>>>>>> d028cf3df254f48e70ee8d65af4c7205c61ef7a6
