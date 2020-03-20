@@ -30,7 +30,6 @@ class FaceDetector extends React.Component {
       }
     })
     .then((response) => {
-      console.log(response);
       this.setState(prevState => {
         return {
           ...prevState,
