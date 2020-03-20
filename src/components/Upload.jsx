@@ -1,11 +1,13 @@
 import React from 'react';
 import axios from 'axios';
 
-class Upload extends React.Component {
+class FaceDetector extends React.Component {
   constructor(props){
     super(props)
     this.state = {
-      file: null
+      file: null,
+      blob: null,
+      faces_data: null
     }
   }
   
@@ -14,55 +16,58 @@ class Upload extends React.Component {
       file: URL.createObjectURL(event.target.files[0]),
       uploaded: event.target.files[0]
     }, () => {
-      this.getFaces(this.state.file);
-      const bounding_box = {
-        "left": 35.54827065765858,
-        "top": 34.57884384691715,
-        "right": 160.25924891233444,
-        "bottom": 189.14457780122757
-      }
-      const { left, top, right, bottom } = bounding_box;
-      this.drawCroppedImage(left, top, right - left, bottom - top, 100, 100);
+      this.getFaces(this.state.uploaded);
     })
   }
 
   getFaces = (image) => {
-    console.log("Getting Faces");
     let data = new FormData();
     data.append('image', image)
-    axios.post('http://167.172.72.129:5000/face-recognition?include_predictions=false', data, {
+    axios.post('http://localhost:5000/face-recognition?include_predictions=false', data, {
       headers: {
           'Content-Type': 'multipart/form-data',
+          'Accept': 'application/json'
       }
     })
-    .then(function (response) {
+    .then((response) => {
       console.log(response);
+      this.setState(prevState => {
+        return {
+          ...prevState,
+          faces_data: response.data
+        }
+      }, () => {
+        const faces = this.state.faces_data['faces'];
+        if (faces) {
+          for (const id in faces) {
+            const { left, top, right, bottom } = faces[id]["bounding_box"];
+            this.drawCroppedImage(left, top, right - left, bottom - top, 100, 100, "face_canvas_" + id);
+          }
+        }
+      });
     })
-    .catch(function (error) {
+    .catch((error) => {
       console.log(error);
     });
   }
 
-  drawCroppedImage = (x, y, width, height, canvas_width, canvas_height) => {
-    const canvas = this.refs["canvas"];
+  drawCroppedImage = (x, y, width, height, canvas_width, canvas_height, canvas_ref) => {
+    const canvas = this.refs[canvas_ref];
     const img = this.refs.image
     canvas.width = canvas_width;
     canvas.height = canvas_height;
     const ctx = canvas.getContext('2d');
-  
-    img.onload = () => {
-      ctx.drawImage(
-        img,
-        x,
-        y,
-        width,
-        height,
-        0,
-        0,
-        canvas_width,
-        canvas_height,
-      );
-    }
+    ctx.drawImage(
+      img,
+      x,
+      y,
+      width,
+      height,
+      0,
+      0,
+      canvas_width,
+      canvas_height,
+    );
   }
 
   render = () => {
@@ -78,12 +83,19 @@ class Upload extends React.Component {
           )
         }
         {
-          this.state.file && (
-            <canvas ref="canvas" />
-          )
+          this.state.faces_data && 
+            Object.entries(this.state.faces_data.faces).map(([face, value]) => (
+              <React.Fragment>
+                <canvas ref={"face_canvas_" + face}
+                  key={"face_canvas_" + face}
+                />
+                <h3 key={"face_label_" + face}>{value.top_prediction.label}</h3>
+              </React.Fragment>
+            ))
         }
+
       </div>
     );
   }
 }
-export default Upload
+export default FaceDetector
