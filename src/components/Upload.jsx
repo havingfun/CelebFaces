@@ -1,6 +1,6 @@
 import React from 'react';
 import axios from 'axios';
-
+const FACE_API = "http://167.172.72.129:5000/face-recognition?include_predictions=false"
 class FaceDetector extends React.Component {
   constructor(props){
     super(props)
@@ -23,7 +23,7 @@ class FaceDetector extends React.Component {
   getFaces = (image) => {
     let data = new FormData();
     data.append('image', image)
-    axios.post('http://localhost:5000/face-recognition?include_predictions=false', data, {
+    axios.post(FACE_API, data, {
       headers: {
           'Content-Type': 'multipart/form-data',
           'Accept': 'application/json'
