@@ -12,12 +12,18 @@ class FaceDetector extends React.Component {
   }
   
   handleChange = (event) => {
-    this.setState({
-      file: URL.createObjectURL(event.target.files[0]),
-      uploaded: event.target.files[0]
-    }, () => {
-      this.getFaces(this.state.uploaded);
-    })
+    const file = event.target.files[0];
+    const validImageTypes = ['image/gif', 'image/jpeg', 'image/png'];
+    if (!file || !validImageTypes.includes(file['type'])) {
+      alert('Upload Valid Image');
+    } else {
+      this.setState({
+        file: URL.createObjectURL(file),
+        uploaded: file
+      }, () => {
+        this.getFaces(this.state.uploaded);
+      })
+    }
   }
 
   getFaces = (image) => {
